@@ -27,7 +27,6 @@ namespace AI
             // TODO: calculate linear component
             output.linear = GetKinematic(agent).linear - agent.Velocity;
             
-
             if (debug) Debug.DrawRay(transform.position + agent.Velocity, output.linear, Color.green);
 
             return output;

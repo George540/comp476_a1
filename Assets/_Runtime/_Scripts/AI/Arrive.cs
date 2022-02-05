@@ -23,7 +23,22 @@ namespace AI
             var output = base.GetKinematic(agent);
 
             // TODO: calculate linear component
+            Vector3 desiredVelocity = agent.TargetPosition - transform.position;
+            var distance = desiredVelocity.magnitude;
+            desiredVelocity = desiredVelocity.normalized * agent.maxSpeed;
+
+            if (distance <= stopRadius)
+            {
+                desiredVelocity *= 0;
+            }
+            else if (distance < slowRadius)
+            {
+                desiredVelocity *= (distance / slowRadius);
+            }
+
+            output.linear = desiredVelocity;
 			
+            if (debug) Debug.DrawRay(transform.position + agent.Velocity, output.linear, Color.green);
 			
             return output;
         }
@@ -35,6 +50,7 @@ namespace AI
             var output = base.GetSteering(agent);
 
             // TODO: calculate linear component
+            output.linear = GetKinematic(agent).linear - agent.Velocity;
 
             return output;
         }

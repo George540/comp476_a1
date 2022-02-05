@@ -9,7 +9,12 @@ namespace AI
             var output = base.GetKinematic(agent);
 
             // TODO: calculate linear component
+            Vector3 desiredVelocity = transform.position - agent.TargetPosition;
+            desiredVelocity = desiredVelocity.normalized * agent.maxSpeed;
+
+            output.linear = desiredVelocity;
             
+            if (debug) Debug.DrawRay(transform.position, output.linear, Color.cyan);
 			
             return output;
         }

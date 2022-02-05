@@ -24,7 +24,13 @@ namespace AI
             var output = base.GetSteering(agent);
 
             // TODO: calculate linear component
-			
+            Vector3 desiredVelocity = transform.position - agent.TargetPosition;
+            desiredVelocity = desiredVelocity.normalized * agent.maxSpeed;
+            Vector3 steering = desiredVelocity - agent.Velocity;
+
+            output.linear = desiredVelocity;
+            
+            if (debug) Debug.DrawRay(transform.position, output.linear, Color.cyan);
 			
             return output;
         }

@@ -1630,6 +1630,8 @@ MonoBehaviour:
   lockY: 1
   debug: 0
   behaviorType: 1
+  _ePlayerState: 0
+  _skinnedMeshRenderer: {fileID: 1433830825892453868}
   trackedTarget: {fileID: 0}
   targetPosition: {x: 0, y: 0, z: 0}
 --- !u!1 &6980941391421200847

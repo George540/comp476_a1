@@ -1,20 +1,21 @@
-﻿using UnityEngine;
+﻿using AI;
+using UnityEngine;
 
-namespace AI
+namespace _Runtime._Scripts.AI
 {
-    public class Seek : AIMovement
+    public class Pursue : AIMovement
     {
         public override SteeringOutput GetKinematic(AIAgent agent)
         {
             var output = base.GetKinematic(agent);
 
             // TODO: calculate linear component
-            Vector3 desiredVelocity = agent.TargetPosition - agent.transform.position;
-            desiredVelocity = desiredVelocity.normalized * agent.maxSpeed;
+            float distance = Vector3.Distance(agent.TargetPosition, transform.position);
+            float ahead = distance / 10;
+            Vector3 futurePosition = agent.TargetPosition + agent.TargetVelocity * ahead;
 
-            output.linear = desiredVelocity;
+            output.linear = GetKinematic(agent).linear - agent.Velocity;
             
-
             if (debug) Debug.DrawRay(transform.position, output.linear, Color.cyan);
 
             return output;
@@ -28,20 +29,12 @@ namespace AI
             float distance = Vector3.Distance(agent.TargetPosition, transform.position);
             float ahead = distance / 10;
             Vector3 futurePosition = agent.TargetPosition + agent.TargetVelocity * ahead;
-            
-            // Seek()
-            output.linear = KinematicSeek(agent, futurePosition) - agent.Velocity;
+
+            output.linear = GetKinematic(agent).linear - agent.Velocity;
             
             if (debug) Debug.DrawRay(transform.position + agent.Velocity, output.linear, Color.green);
 
             return output;
-        }
-
-        private Vector3 KinematicSeek(AIAgent agent, Vector3 desiredPosition)
-        {
-            Vector3 desiredVelocity = desiredPosition - transform.position;
-            desiredVelocity = desiredVelocity.normalized * agent.maxSpeed;
-            return desiredVelocity;
         }
     }
 }

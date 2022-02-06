@@ -1,3 +1,4 @@
+using _Runtime._Scripts;
 using UnityEngine;
 
 namespace AI
@@ -11,11 +12,13 @@ namespace AI
 
         public enum EBehaviorType { Kinematic, Steering }
         public EBehaviorType behaviorType;
+        public PlayerState.EPlayerState _ePlayerState;
 
+        [SerializeField] private SkinnedMeshRenderer _skinnedMeshRenderer;
         private Animator animator;
 
-        [SerializeField] private Transform trackedTarget;
-        [SerializeField] private Vector3 targetPosition;
+        public Transform trackedTarget;
+        public Vector3 targetPosition;
         public Vector3 TargetPosition
         {
             get => trackedTarget != null ? trackedTarget.position : targetPosition;
@@ -130,6 +133,11 @@ namespace AI
                 steeringForceSum += movement.GetSteering(this).linear;
                 rotation *= movement.GetSteering(this).angular;
             }
+        }
+
+        public void SetMaterial(Material mat)
+        {
+            _skinnedMeshRenderer.material = mat;
         }
     }
 }

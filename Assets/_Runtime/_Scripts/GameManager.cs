@@ -10,7 +10,7 @@ namespace _Runtime._Scripts
         public static GameManager Instance;
 
         [SerializeField] private List<AIAgent> _players = new List<AIAgent>();
-        [SerializeField] private List<Material> _cMaterials = new List<Material>();
+        public List<Material> _cMaterials = new List<Material>();
 
         public AIAgent _pursuer;
         public float _tagDistance = 1f;
@@ -99,7 +99,7 @@ namespace _Runtime._Scripts
         }
         
         // Find closest unfrozen player who can unfreeze the frozen agent
-        private void FindNearestTargetToUnfreeze(AIAgent frozenGuy)
+        private AIAgent FindNearestTargetToUnfreeze(AIAgent frozenGuy)
         {
             AIAgent closestPlayer = null;
             float closestDistanceSqr = Mathf.Infinity;
@@ -134,6 +134,8 @@ namespace _Runtime._Scripts
                 closestPlayer.gameObject.AddComponent<LookWhereYouAreGoing>();
                 closestPlayer.gameObject.AddComponent<Arrive>();
             }
+
+            return closestPlayer;
         }
         
         void CheckIfTagged()
@@ -149,10 +151,11 @@ namespace _Runtime._Scripts
                 target.SetMaterial(_cMaterials[2]);
                 target._ePlayerState = PlayerState.EPlayerState.Frozen;
                 target.UnTrackTarget();
-                FindNearestTargetToUnfreeze(target);
 
                 _pursuer.UnTrackTarget();
                 _pursuer.trackedTarget = FindNearestTargetToFreeze().transform;
+                
+                target.TrackTarget(FindNearestTargetToUnfreeze(target).transform);
             }
         }
     }

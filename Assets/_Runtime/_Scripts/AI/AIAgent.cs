@@ -63,6 +63,7 @@ namespace AI
         private void Update()
         {
             //CheckPosition();
+            CheckIfUnfrozen();
             
             if (debug)
                 Debug.DrawRay(transform.position, Velocity, Color.red);
@@ -163,6 +164,42 @@ namespace AI
             else if (transform.position.z > offset)
             {
                 transform.position = new Vector3(transform.position.x, transform.position.y, -offset + 1);
+            }
+        }
+
+        void CheckIfUnfrozen()
+        {
+            if (trackedTarget == null) return;
+            
+            if (_ePlayerState == PlayerState.EPlayerState.Unfrozen &&
+                trackedTarget.gameObject.GetComponent<AIAgent>()._ePlayerState == PlayerState.EPlayerState.Frozen)
+            {
+                if (Vector3.Distance(trackedTarget.position, transform.position) <=
+                    GameManager.Instance._tagDistance)
+                {
+                    // Make frozen guy unfreeze and keep wandering
+                    Destroy(trackedTarget.gameObject.GetComponent<Stop>());
+                    var target = trackedTarget.GetComponent<AIAgent>();
+                    target.behaviorType = EBehaviorType.Steering;
+                    target.gameObject.AddComponent<Wander>();
+                    target.gameObject.AddComponent<LookWhereYouAreGoing>();
+                    target.SetMaterial(GameManager.Instance._cMaterials[1]);
+                    target._ePlayerState = PlayerState.EPlayerState.Unfrozen;
+                    target.UnTrackTarget();
+                        
+                    // Make agent who unfreezes to keep wandering
+                    if (gameObject.GetComponent<Arrive>() != null)
+                    {
+                        Destroy(gameObject.GetComponent<Arrive>());
+                    }
+                    if (gameObject.GetComponent<LookWhereYouAreGoing>() != null)
+                    {
+                        Destroy(gameObject.GetComponent<LookWhereYouAreGoing>());
+                    }
+                    _ePlayerState = PlayerState.EPlayerState.Unfrozen;
+                    gameObject.AddComponent<Wander>();
+                    UnTrackTarget();
+                }
             }
         }
     }

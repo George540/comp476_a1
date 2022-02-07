@@ -1628,7 +1628,7 @@ MonoBehaviour:
   maxSpeed: 3
   maxDegreesDelta: 360
   lockY: 1
-  debug: 0
+  debug: 1
   behaviorType: 1
   _ePlayerState: 0
   _skinnedMeshRenderer: {fileID: 1433830825892453868}

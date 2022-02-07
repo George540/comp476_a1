@@ -54,11 +54,43 @@ namespace AI
             var output = base.GetSteering(agent);
 
             // TODO: calculate linear component
-            
+            output.linear = KinematicWander(agent) - agent.Velocity;
 
             if (debug) Debug.DrawRay(transform.position + agent.Velocity, output.linear, Color.green);
 
             return output;
+        }
+
+        private Vector3 KinematicWander(AIAgent agent)
+        {
+            wanderTimer += Time.deltaTime;
+
+            if (lastWanderDirection == Vector3.zero)
+            {
+                lastWanderDirection = transform.forward.normalized * agent.maxSpeed;
+            }
+
+            if (lastDispalcement == Vector3.zero)
+            {
+                lastDispalcement = transform.forward;
+            }
+
+            Vector3 desiredVelocity = lastDispalcement;
+            if (wanderTimer > wanderInterval)
+            {
+                float angle = (Random.value - Random.value) * wanderDegreesDelta;
+                Vector3 direction = Quaternion.AngleAxis(angle, Vector3.up) * lastWanderDirection.normalized;
+                Vector3 circleCenter = transform.position + lastDispalcement;
+                Vector3 destination = circleCenter + direction.normalized;
+                desiredVelocity = destination - transform.position;
+                desiredVelocity = desiredVelocity.normalized * agent.maxSpeed;
+
+                lastDispalcement = desiredVelocity;
+                lastWanderDirection = direction;
+                wanderTimer = 0;
+            }
+
+            return desiredVelocity;
         }
     }
 }

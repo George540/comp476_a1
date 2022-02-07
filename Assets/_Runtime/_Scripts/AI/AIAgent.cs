@@ -62,6 +62,8 @@ namespace AI
 
         private void Update()
         {
+            //CheckPosition();
+            
             if (debug)
                 Debug.DrawRay(transform.position, Velocity, Color.red);
 
@@ -138,6 +140,30 @@ namespace AI
         public void SetMaterial(Material mat)
         {
             _skinnedMeshRenderer.material = mat;
+        }
+
+        // Wraps agent's position within a certain perimeter.
+        // If agent exceeds X-Z limits, it wraps on the other side
+        void CheckPosition()
+        {
+            var offset = GameManager.Instance.maxOffset;
+            if (transform.position.x < -offset)
+            {
+                transform.position = new Vector3(offset - 1, transform.position.y, transform.position.z);
+            }
+            else if (transform.position.x > offset)
+            {
+                transform.position = new Vector3(-offset + 1, transform.position.y, transform.position.z);
+            }
+            
+            if (transform.position.z < -offset)
+            {
+                transform.position = new Vector3(transform.position.x, transform.position.y, offset - 1);
+            }
+            else if (transform.position.z > offset)
+            {
+                transform.position = new Vector3(transform.position.x, transform.position.y, -offset + 1);
+            }
         }
     }
 }

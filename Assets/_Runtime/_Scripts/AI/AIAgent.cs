@@ -62,6 +62,8 @@ namespace AI
 
         private void Update()
         {
+            // Uncomment this if you wanna test Wrapping positions
+            // Note: There is no functionality of pursuer calculating wrapping distance :/
             //CheckPosition();
             CheckIfUnfrozen();
             

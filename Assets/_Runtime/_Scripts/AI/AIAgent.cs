@@ -65,8 +65,11 @@ namespace AI
             // Uncomment this if you wanna test Wrapping positions
             // Note: There is no functionality of pursuer calculating wrapping distance :/
             //CheckPosition();
-            CheckIfUnfrozen();
-            
+            if (GameManager.Instance != null)
+            {
+                CheckIfUnfrozen();
+            }
+
             if (debug)
                 Debug.DrawRay(transform.position, Velocity, Color.red);
 
@@ -149,7 +152,11 @@ namespace AI
         // If agent exceeds X-Z limits, it wraps on the other side
         void CheckPosition()
         {
-            var offset = GameManager.Instance.maxOffset;
+            var offset = 40f;
+            if (GameManager.Instance != null)
+            {
+                offset = GameManager.Instance.maxOffset;
+            }
             if (transform.position.x < -offset)
             {
                 transform.position = new Vector3(offset - 1, transform.position.y, transform.position.z);
@@ -173,7 +180,7 @@ namespace AI
         {
             if (trackedTarget == null) return;
             
-            if (_ePlayerState == PlayerState.EPlayerState.Unfrozen &&
+            if (_ePlayerState == PlayerState.EPlayerState.Rescuer &&
                 trackedTarget.gameObject.GetComponent<AIAgent>()._ePlayerState == PlayerState.EPlayerState.Frozen)
             {
                 if (Vector3.Distance(trackedTarget.position, transform.position) <=
@@ -186,6 +193,7 @@ namespace AI
                     target.gameObject.AddComponent<Wander>();
                     target.gameObject.AddComponent<LookWhereYouAreGoing>();
                     target.SetMaterial(GameManager.Instance._cMaterials[1]);
+                    SetMaterial(GameManager.Instance._cMaterials[1]);
                     target._ePlayerState = PlayerState.EPlayerState.Unfrozen;
                     target.UnTrackTarget();
                         

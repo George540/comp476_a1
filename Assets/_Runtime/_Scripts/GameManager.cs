@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using AI;
 using UnityEngine;
 
@@ -17,6 +18,8 @@ namespace _Runtime._Scripts
 
         // current pursuer
         public AIAgent _pursuer;
+
+        public AIAgent _lastTarget;
         // maximum distance between target and pursuer to freeze
         public float _tagDistance = 1f;
         
@@ -61,8 +64,15 @@ namespace _Runtime._Scripts
         private void SetPursuer(AIAgent agent)
         {
             _pursuer = agent;
-            Destroy(_pursuer.gameObject.GetComponent<Wander>());
-            Destroy(_pursuer.gameObject.GetComponent<LookWhereYouAreGoing>());
+            if (_pursuer.gameObject.GetComponent<Wander>() != null)
+            {
+                Destroy(_pursuer.gameObject.GetComponent<Wander>());
+            }
+
+            if (_pursuer.gameObject.GetComponent<LookWhereYouAreGoing>() != null)
+            {
+                Destroy(_pursuer.gameObject.GetComponent<LookWhereYouAreGoing>());
+            }
             _pursuer.maxSpeed *= 1.8f;
             _pursuer.SetMaterial(_cMaterials[0]);
             _pursuer._ePlayerState = PlayerState.EPlayerState.Tagged;
@@ -73,12 +83,20 @@ namespace _Runtime._Scripts
 
         private AIAgent FindNearestTargetToFreeze()
         {
+            // Set last target by pursuer, so he can be pursuer once he's frozen and the game restarts
+            if (_players.FindAll(player => player._ePlayerState == PlayerState.EPlayerState.Unfrozen).Count <= 1)
+            {
+                _lastTarget = _players.Find(player => player._ePlayerState != PlayerState.EPlayerState.Tagged);
+            }
+            
             AIAgent closestPlayer = null;
             var closestDistanceSqr = Mathf.Infinity;
             foreach (var player in _players)
             {
-                // skip if it compares itself or someone who is already frozen
-                if (player._ePlayerState == PlayerState.EPlayerState.Tagged || player._ePlayerState == PlayerState.EPlayerState.Frozen) continue;
+                // skip if it compares itself or someone who is already frozen, being a rescuer or being a pursuer themselves
+                if (player._ePlayerState == PlayerState.EPlayerState.Tagged || 
+                    player._ePlayerState == PlayerState.EPlayerState.Frozen || 
+                    player._ePlayerState == PlayerState.EPlayerState.Rescuer) continue;
 
                 var distance = player.transform.position - _pursuer.transform.position;
                 var dSqrToTarget = distance.sqrMagnitude;
@@ -106,6 +124,31 @@ namespace _Runtime._Scripts
                 closestPlayer._ePlayerState = PlayerState.EPlayerState.Targeted;
                 closestPlayer.gameObject.AddComponent<Flee>();
                 closestPlayer.gameObject.AddComponent<FaceAway>();
+            }
+            else
+            {
+                foreach (var player in _players)
+                {
+                    player.UnTrackTarget();
+                    if (player.GetComponent<Stop>() != null)
+                    {
+                        Destroy(player.GetComponent<Stop>());
+                    }
+                    if (player.GetComponent<Seek>() != null)
+                    {
+                        Destroy(player.GetComponent<Seek>());
+                    }
+                    if (player.GetComponent<Arrive>() != null)
+                    {
+                        Destroy(player.GetComponent<Arrive>());
+                    }
+                    player.behaviorType = AIAgent.EBehaviorType.Steering;
+                    player._ePlayerState = PlayerState.EPlayerState.Unfrozen;
+                    player.gameObject.AddComponent<LookWhereYouAreGoing>();
+                    player.gameObject.AddComponent<Wander>();
+                    player.SetMaterial(_cMaterials[1]);
+                }
+                SetPursuer(_lastTarget);
             }
             return closestPlayer;
         }
@@ -142,11 +185,11 @@ namespace _Runtime._Scripts
                 }
                 closestPlayer.TrackTarget(frozenGuy.transform);
                 closestPlayer.behaviorType = AIAgent.EBehaviorType.Steering;
-                closestPlayer._ePlayerState = PlayerState.EPlayerState.Unfrozen;
+                closestPlayer._ePlayerState = PlayerState.EPlayerState.Rescuer;
                 closestPlayer.gameObject.AddComponent<LookWhereYouAreGoing>();
                 closestPlayer.gameObject.AddComponent<Arrive>();
+                closestPlayer.SetMaterial(_cMaterials[3]);
             }
-
             return closestPlayer;
         }
         
@@ -169,6 +212,13 @@ namespace _Runtime._Scripts
             _pursuer.trackedTarget = FindNearestTargetToFreeze().transform;
                 
             target.TrackTarget(FindNearestTargetToUnfreeze(target).transform);
+        }
+
+        bool CheckIfAllTagged()
+        {
+            var isGameEnded = _players.All(player => player._ePlayerState == PlayerState.EPlayerState.Frozen ||
+                                             player._ePlayerState == PlayerState.EPlayerState.Tagged);
+            return isGameEnded;
         }
         
         // Floating game object that indicates the pursuer's current target

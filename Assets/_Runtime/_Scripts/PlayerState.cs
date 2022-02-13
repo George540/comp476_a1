@@ -9,6 +9,7 @@ namespace _Runtime._Scripts
             Frozen,
             Unfrozen,
             Targeted,
+            Rescuer,
             Tagged
         }
     }

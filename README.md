@@ -11,7 +11,8 @@ In conjunction of the Theoretical parts, Question 1 and Question 2, the programm
 
 R1: I had set up the scene (A1_R1_R2) from the lab using the plane floor and AI agent prefabs that were already animated. The wrapping mechanic works, but
 the pursuer in the tag game is not aware of it when pursuing a target. Basically, the pursuer does not know that once its target wraps around,
-it won't consider it as finding a closer dstance, so I disable it when I want to test the behaviours properly.
+it won't consider it as finding a closer dstance, so I disable it when I want to test the behaviours properly. I tried using the Toroidal distance, but
+with no success. Check GameManager.cs on the last function to see my attempt.
 
 R2: The same scene (Lab 02), but Kinematic Arrive and Kinematic Flee are set up properly. At script AIAgent.cs at line 88, you will see the Interpolation
 Change in Rotation with a t2t = Time.deltatime * 1000f

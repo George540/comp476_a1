@@ -1,3 +1,4 @@
+using System.Text;
 using _Runtime._Scripts;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ namespace AI
         public float maxDegreesDelta;
         public bool lockY = true;
         public bool debug;
+        public bool isChangingOrientation = false;
 
         public enum EBehaviorType { Kinematic, Steering }
         public EBehaviorType behaviorType;
@@ -83,7 +85,8 @@ namespace AI
                 transform.position += Velocity * Time.deltaTime;
 
                 rotation = Quaternion.Euler(0f, rotation.eulerAngles.y, 0f);
-                transform.rotation = rotation;
+                // INTERPOLATION OF ROTATION IS HERE
+                transform.rotation = isChangingOrientation ? Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * 1000f) : rotation;
             }
             else
             {

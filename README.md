@@ -43,5 +43,11 @@ LookWhereYouAreGoingBehaviour.cs
 
 For more information, check source code, which has nice comments. For R3, start with focusing on AIManager.cs
 
+CAMERA CONTROLS DURING RUNTIME:
+Right click drag mouse to look around
+Right click hold mouse + WASD to move
+Right click hold mount + QE to ascend/descend
+(Same controls as Lab 02)
+
 George Mavroeidis
 40065356

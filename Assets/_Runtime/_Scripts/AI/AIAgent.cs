@@ -66,7 +66,7 @@ namespace AI
         {
             // Uncomment this if you wanna test Wrapping positions
             // Note: There is no functionality of pursuer calculating wrapping distance :/
-            //CheckPosition();
+            CheckPosition();
             if (GameManager.Instance != null)
             {
                 CheckIfUnfrozen();

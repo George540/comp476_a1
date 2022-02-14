@@ -90,7 +90,7 @@ namespace _Runtime._Scripts
             }
             
             AIAgent closestPlayer = null;
-            var closestDistanceSqr = Mathf.Infinity;
+            float closestDistanceSqr = Mathf.Infinity;
             foreach (var player in _players)
             {
                 // skip if it compares itself or someone who is already frozen, being a rescuer or being a pursuer themselves
@@ -98,12 +98,11 @@ namespace _Runtime._Scripts
                     player._ePlayerState == PlayerState.EPlayerState.Frozen || 
                     player._ePlayerState == PlayerState.EPlayerState.Rescuer) continue;
 
-                var distance = player.transform.position - _pursuer.transform.position;
-                var dSqrToTarget = distance.sqrMagnitude;
+                var distance = ToroidalDistance(_pursuer.transform.position, player.transform.position);
                 // check if current comparison is smaller than the current closest player to target
-                if (dSqrToTarget < closestDistanceSqr)
+                if (distance < closestDistanceSqr)
                 {
-                    closestDistanceSqr = dSqrToTarget;
+                    closestDistanceSqr = distance;
                     closestPlayer = player;
                 }
             }
@@ -162,12 +161,11 @@ namespace _Runtime._Scripts
             {
                 if (player._ePlayerState == PlayerState.EPlayerState.Unfrozen)
                 {
-                    var distance = player.transform.position - frozenGuy.transform.position;
-                    var dSqrToTarget = distance.sqrMagnitude;
+                    var distance = ToroidalDistance(frozenGuy.transform.position, player.transform.position);
                     // check if current comparison is smaller than the current closest player to target
-                    if (dSqrToTarget < closestDistanceSqr)
+                    if (distance < closestDistanceSqr)
                     {
-                        closestDistanceSqr = dSqrToTarget;
+                        closestDistanceSqr = distance;
                         closestPlayer = player;
                     }
                 }
@@ -228,6 +226,20 @@ namespace _Runtime._Scripts
             {
                 _targetCone.position = _pursuer.trackedTarget.transform.position + new Vector3(0f, 3f, 0f);
             }
+        }
+
+        private float ToroidalDistance(Vector3 p1, Vector3 p2)
+        {
+            float dx = Mathf.Abs(p2.x - p1.x);
+            float dz = Mathf.Abs(p2.z - p1.z);
+ 
+            if (dx > 0.5f)
+                dx = 1.0f - dx;
+ 
+            if (dz > 0.5f)
+                dz = 1.0f - dz;
+ 
+            return Mathf.Sqrt(dx*dx + dz*dz);
         }
     }
 }

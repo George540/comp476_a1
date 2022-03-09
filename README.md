@@ -1,5 +1,9 @@
 COMP 476 Programming Assignment 1 - George Mavroeidis
 
+FINAL MARK: 75%
+- Did not do well on Q2 and could not get the Toroidal distance to work
+- Some other small things, but the movement AI is fine
+
 Professor: Kaustubha Mendhurwar
 Teacher Assistant: Daniel Rinaldi
 
